@@ -1,8 +1,9 @@
-use std::io;
-use std::io::Write;
+use dialoguer::Select;
+use std::io::{self, Write};
 
 fn main() {
-    let mut personalities: Vec<(String, f32)> = Vec::new();
+    let mut personalities: Vec<(String, f32)> =
+        Vec::from([(String::from("a"), 50.0), (String::from("b"), 50.0)]);
 
     loop {
         println!("Bronco Personality Randomizer");
@@ -19,7 +20,7 @@ fn main() {
         match num_option {
             1 => println!("Personality"),
             2 => add_personality(&mut personalities),
-            3 => println!("Remove personality"),
+            3 => remove_personality(&mut personalities),
             4 => println!("Display personality table"),
             _ => println!("Invalid option."),
         }
@@ -42,4 +43,26 @@ fn add_personality(personalities: &mut Vec<(String, f32)>) {
     personalities.push((personality.trim().to_string(), percentage));
 
     println!("Personality {} added.", personality.trim())
+}
+
+fn remove_personality(personalities: &mut Vec<(String, f32)>) {
+    if personalities.len() == 0 {
+        println!("No personalities found.");
+        return;
+    }
+
+    let display_items: Vec<&String> = personalities.iter().map(|(title, _)| title).collect();
+
+    let selection = Select::new()
+        .with_prompt("Choose an option")
+        .items(display_items)
+        .default(0)
+        .interact()
+        .unwrap();
+
+    let personality = personalities[selection].0.clone();
+
+    personalities.remove(selection);
+
+    println!("Personality {} removed.", personality.trim())
 }
