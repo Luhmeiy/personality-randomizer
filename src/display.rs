@@ -14,7 +14,7 @@ pub fn display_personalities(personalities: &Vec<(String, f32)>) {
         title_width = title_width.max(title.chars().count());
 
         let percentage_str = percentage.to_string();
-        percentage_width = percentage_width.max(percentage_str.len());
+        percentage_width = percentage_width.max(percentage_str.len() + 1);
     }
 
     print_border(title_width, percentage_width);

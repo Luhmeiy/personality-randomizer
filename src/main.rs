@@ -1,7 +1,7 @@
 use dialoguer::Select;
 use rand;
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{self, Write},
 };
 
@@ -9,6 +9,7 @@ mod display;
 
 fn main() {
     let mut personalities: Vec<(String, f32)> = Vec::new();
+    read_file(&mut personalities);
 
     loop {
         println!("Bronco Personality Randomizer");
@@ -31,6 +32,35 @@ fn main() {
             5 => reset_percentages(&mut personalities),
             _ => println!("Invalid option."),
         }
+    }
+}
+
+fn read_file(personalities: &mut Vec<(String, f32)>) {
+    match fs::read_to_string("personalities.txt") {
+        Ok(contents) => {
+            let tuples = contents
+                .trim()
+                .trim_start_matches('[')
+                .trim_end_matches(']');
+
+            for tuple in tuples.split("), (") {
+                let tuple = tuple.trim_start_matches('(').trim_end_matches(')');
+                let split: Vec<&str> = tuple.split(',').collect();
+
+                let title = split[0].trim_matches('"').to_string();
+
+                let value: f32 = match split[1].trim().parse() {
+                    Ok(v) => v,
+                    Err(e) => {
+                        eprintln!("Failed to parse float: {}", e);
+                        continue;
+                    }
+                };
+
+                personalities.push((title, value));
+            }
+        }
+        Err(e) => eprintln!("Failed to read file: {}", e),
     }
 }
 
