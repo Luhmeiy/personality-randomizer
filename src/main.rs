@@ -1,4 +1,5 @@
 use dialoguer::Select;
+use rand;
 use std::io::{self, Write};
 
 mod display;
@@ -20,7 +21,7 @@ fn main() {
         let num_option: i32 = option.trim().parse().unwrap();
 
         match num_option {
-            1 => println!("Personality"),
+            1 => get_random_personality(&mut personalities),
             2 => add_personality(&mut personalities),
             3 => remove_personality(&mut personalities),
             4 => display::display_personalities(&personalities),
@@ -28,6 +29,40 @@ fn main() {
             _ => println!("Invalid option."),
         }
     }
+}
+
+fn get_random_personality(personalities: &mut Vec<(String, f32)>) {
+    if personalities.is_empty() {
+        println!("No personalities found.");
+        return;
+    }
+
+    let mut random_personality_index = 0;
+
+    let total_percentage = personalities.iter().map(|(_, value)| value).sum();
+    let mut random_percentage = rand::random_range(0.0..total_percentage);
+
+    for (index, (_, value)) in personalities.iter_mut().enumerate() {
+        if random_percentage < *value {
+            *value = (*value - 5.0).max(1.0);
+            random_personality_index = index;
+            break;
+        }
+
+        random_percentage -= *value;
+    }
+
+    let new_total = personalities.iter().map(|(_, value)| value).sum::<f32>();
+    let scale = 100.0 / new_total;
+
+    for (_, value) in personalities.iter_mut() {
+        *value *= scale;
+    }
+
+    println!(
+        "Bronco's personality now is: {}",
+        personalities[random_personality_index].0
+    )
 }
 
 fn add_personality(personalities: &mut Vec<(String, f32)>) {
