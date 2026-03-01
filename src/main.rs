@@ -1,6 +1,9 @@
 use dialoguer::Select;
 use rand;
-use std::io::{self, Write};
+use std::{
+    fs::File,
+    io::{self, Write},
+};
 
 mod display;
 
@@ -28,6 +31,17 @@ fn main() {
             5 => reset_percentages(&mut personalities),
             _ => println!("Invalid option."),
         }
+    }
+}
+
+fn write_to_file(personalities: &mut Vec<(String, f32)>) {
+    match File::create("personalities.txt") {
+        Ok(mut file) => {
+            if let Err(e) = writeln!(file, "{:?}", personalities) {
+                eprintln!("Failed to write to file: {}", e);
+            }
+        }
+        Err(e) => eprintln!("Failed to create file: {}", e),
     }
 }
 
@@ -59,6 +73,8 @@ fn get_random_personality(personalities: &mut Vec<(String, f32)>) {
         *value *= scale;
     }
 
+    write_to_file(personalities);
+
     println!(
         "Bronco's personality now is: {}",
         personalities[random_personality_index].0
@@ -79,6 +95,7 @@ fn add_personality(personalities: &mut Vec<(String, f32)>) {
     }
 
     personalities.push((personality.trim().to_string(), percentage));
+    write_to_file(personalities);
 
     println!("Personality {} added.", personality.trim())
 }
@@ -101,6 +118,7 @@ fn remove_personality(personalities: &mut Vec<(String, f32)>) {
     let personality = personalities[selection].0.clone();
 
     personalities.remove(selection);
+    write_to_file(personalities);
 
     println!("Personality {} removed.", personality.trim())
 }
@@ -113,9 +131,11 @@ fn reset_percentages(personalities: &mut Vec<(String, f32)>) {
 
     let percentage = 100.0 / personalities.len() as f32;
 
-    for item in personalities {
+    for item in personalities.iter_mut() {
         item.1 = percentage
     }
+
+    write_to_file(personalities);
 
     println!("Percentages reset.")
 }
