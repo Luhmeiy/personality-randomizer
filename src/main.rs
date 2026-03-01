@@ -1,9 +1,10 @@
 use dialoguer::Select;
 use std::io::{self, Write};
 
+mod display;
+
 fn main() {
-    let mut personalities: Vec<(String, f32)> =
-        Vec::from([(String::from("a"), 50.0), (String::from("b"), 50.0)]);
+    let mut personalities: Vec<(String, f32)> = Vec::new();
 
     loop {
         println!("Bronco Personality Randomizer");
@@ -21,7 +22,7 @@ fn main() {
             1 => println!("Personality"),
             2 => add_personality(&mut personalities),
             3 => remove_personality(&mut personalities),
-            4 => println!("Display personality table"),
+            4 => display::display_personalities(&personalities),
             _ => println!("Invalid option."),
         }
     }
@@ -46,7 +47,7 @@ fn add_personality(personalities: &mut Vec<(String, f32)>) {
 }
 
 fn remove_personality(personalities: &mut Vec<(String, f32)>) {
-    if personalities.len() == 0 {
+    if personalities.is_empty() {
         println!("No personalities found.");
         return;
     }
