@@ -12,6 +12,7 @@ fn main() {
         println!("2 - Add personality");
         println!("3 - Remove personality");
         println!("4 - Display personality table");
+        println!("5 - Reset personalities percentages");
 
         let mut option = String::new();
 
@@ -23,6 +24,7 @@ fn main() {
             2 => add_personality(&mut personalities),
             3 => remove_personality(&mut personalities),
             4 => display::display_personalities(&personalities),
+            5 => reset_percentages(&mut personalities),
             _ => println!("Invalid option."),
         }
     }
@@ -66,4 +68,19 @@ fn remove_personality(personalities: &mut Vec<(String, f32)>) {
     personalities.remove(selection);
 
     println!("Personality {} removed.", personality.trim())
+}
+
+fn reset_percentages(personalities: &mut Vec<(String, f32)>) {
+    if personalities.is_empty() {
+        println!("No personalities found.");
+        return;
+    }
+
+    let percentage = 100.0 / personalities.len() as f32;
+
+    for item in personalities {
+        item.1 = percentage
+    }
+
+    println!("Percentages reset.")
 }
