@@ -75,6 +75,15 @@ fn write_to_file(personalities: &mut Vec<(String, f32)>) {
     }
 }
 
+fn recalculate_percentages(personalities: &mut Vec<(String, f32)>) {
+    let new_total = personalities.iter().map(|(_, value)| value).sum::<f32>();
+    let scale = 100.0 / new_total;
+
+    for (_, value) in personalities.iter_mut() {
+        *value *= scale;
+    }
+}
+
 fn get_random_personality(personalities: &mut Vec<(String, f32)>) {
     if personalities.is_empty() {
         println!("No personalities found.");
@@ -96,13 +105,7 @@ fn get_random_personality(personalities: &mut Vec<(String, f32)>) {
         random_percentage -= *value;
     }
 
-    let new_total = personalities.iter().map(|(_, value)| value).sum::<f32>();
-    let scale = 100.0 / new_total;
-
-    for (_, value) in personalities.iter_mut() {
-        *value *= scale;
-    }
-
+    recalculate_percentages(personalities);
     write_to_file(personalities);
 
     println!(
@@ -118,13 +121,10 @@ fn add_personality(personalities: &mut Vec<(String, f32)>) {
     let mut personality = String::new();
     io::stdin().read_line(&mut personality).unwrap();
 
-    let percentage = 100.0 / (personalities.len() as f32 + 1.0);
-
-    for item in personalities.iter_mut() {
-        item.1 = (item.1 / 100.0) * (100.0 - percentage)
-    }
-
+    let percentage = 100.0 / personalities.len() as f32;
     personalities.push((personality.trim().to_string(), percentage));
+
+    recalculate_percentages(personalities);
     write_to_file(personalities);
 
     println!("Personality {} added.", personality.trim())
@@ -148,6 +148,8 @@ fn remove_personality(personalities: &mut Vec<(String, f32)>) {
     let personality = personalities[selection].0.clone();
 
     personalities.remove(selection);
+
+    recalculate_percentages(personalities);
     write_to_file(personalities);
 
     println!("Personality {} removed.", personality.trim())
