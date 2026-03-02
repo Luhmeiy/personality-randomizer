@@ -20,9 +20,21 @@ fn main() {
         println!("5 - Reset personalities percentages");
 
         let mut option = String::new();
+        match io::stdin().read_line(&mut option) {
+            Ok(..) => {}
+            Err(error) => {
+                eprintln!("Failed to read from stdin: {}", error);
+                continue;
+            }
+        }
 
-        io::stdin().read_line(&mut option).unwrap();
-        let num_option: i32 = option.trim().parse().unwrap();
+        let num_option: i32 = match option.trim().parse() {
+            Ok(value) => value,
+            Err(..) => {
+                println!("Invalid option.");
+                continue;
+            }
+        };
 
         match num_option {
             1 => get_random_personality(&mut personalities),
@@ -119,15 +131,28 @@ fn add_personality(personalities: &mut Vec<(String, f32)>) {
     io::stdout().flush().unwrap();
 
     let mut personality = String::new();
-    io::stdin().read_line(&mut personality).unwrap();
+    match io::stdin().read_line(&mut personality) {
+        Ok(..) => {}
+        Err(error) => {
+            eprintln!("Failed to read from stdin: {}", error);
+            return;
+        }
+    }
+
+    let trimmed_personality = personality.trim();
+
+    if trimmed_personality.is_empty() {
+        println!("Empty personality not allowed.");
+        return;
+    }
 
     let percentage = 100.0 / personalities.len() as f32;
-    personalities.push((personality.trim().to_string(), percentage));
+    personalities.push((trimmed_personality.to_string(), percentage));
 
     recalculate_percentages(personalities);
     write_to_file(personalities);
 
-    println!("Personality {} added.", personality.trim())
+    println!("Personality {} added.", trimmed_personality)
 }
 
 fn remove_personality(personalities: &mut Vec<(String, f32)>) {
@@ -138,12 +163,18 @@ fn remove_personality(personalities: &mut Vec<(String, f32)>) {
 
     let display_items: Vec<&String> = personalities.iter().map(|(title, _)| title).collect();
 
-    let selection = Select::new()
+    let selection = match Select::new()
         .with_prompt("Choose an option")
         .items(display_items)
         .default(0)
         .interact()
-        .unwrap();
+    {
+        Ok(index) => index,
+        Err(e) => {
+            eprintln!("Error during selection: {}", e);
+            return;
+        }
+    };
 
     let personality = personalities[selection].0.clone();
 
@@ -163,8 +194,8 @@ fn reset_percentages(personalities: &mut Vec<(String, f32)>) {
 
     let percentage = 100.0 / personalities.len() as f32;
 
-    for item in personalities.iter_mut() {
-        item.1 = percentage
+    for (_, value) in personalities.iter_mut() {
+        *value = percentage
     }
 
     write_to_file(personalities);
