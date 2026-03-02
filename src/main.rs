@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, Write};
 
 mod display;
 mod file_io;
@@ -40,6 +40,8 @@ impl MenuAction {
             return;
         }
 
+        println!();
+
         match self {
             MenuAction::Random => personality::get_random_personality(personalities),
             MenuAction::Add => personality::add_personality(personalities),
@@ -48,6 +50,14 @@ impl MenuAction {
             MenuAction::Reset => personality::reset_percentages(personalities),
             MenuAction::Invalid => println!("Invalid option."),
         }
+
+        print!("Press any key to continue...");
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line");
     }
 }
 
@@ -56,12 +66,15 @@ fn main() {
     file_io::read_file(&mut personalities);
 
     loop {
+        print!("\x1B[2J");
         println!("Bronco Personality Randomizer");
         println!("1 - Random personality");
         println!("2 - Add personality");
         println!("3 - Remove personality");
         println!("4 - Display personality table");
         println!("5 - Reset personalities percentages");
+        print!("Choose option: ");
+        io::stdout().flush().unwrap();
 
         let mut option = String::new();
         match io::stdin().read_line(&mut option) {
