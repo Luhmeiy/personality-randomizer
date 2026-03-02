@@ -58,7 +58,14 @@ pub fn add_personality(personalities: &mut Vec<(String, f32)>) {
         return;
     }
 
-    let percentage = 100.0 / personalities.len() as f32;
+    let personality_length = personalities.len();
+
+    let percentage = if personality_length != 0 {
+        100.0 / personality_length as f32
+    } else {
+        100.0
+    };
+
     personalities.push((trimmed_personality.to_string(), percentage));
 
     recalculate_percentages(personalities);

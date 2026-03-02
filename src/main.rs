@@ -35,12 +35,13 @@ impl MenuAction {
     }
 
     fn execute(self, personalities: &mut Vec<(String, f32)>) {
+        println!();
+
         if self.requires_non_empty() && personalities.is_empty() {
             println!("No personalities found.");
+            press_to_continue();
             return;
         }
-
-        println!();
 
         match self {
             MenuAction::Random => personality::get_random_personality(personalities),
@@ -51,14 +52,18 @@ impl MenuAction {
             MenuAction::Invalid => println!("Invalid option."),
         }
 
-        print!("Press any key to continue...");
-        io::stdout().flush().unwrap();
-
-        let mut input = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line");
+        press_to_continue()
     }
+}
+
+fn press_to_continue() {
+    print!("Press any key to continue...");
+    io::stdout().flush().unwrap();
+
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
 }
 
 fn main() {
