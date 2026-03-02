@@ -4,6 +4,53 @@ mod display;
 mod file_io;
 mod personality;
 
+enum MenuAction {
+    Random,
+    Add,
+    Remove,
+    Display,
+    Reset,
+    Invalid,
+}
+
+impl MenuAction {
+    fn from_number(option: i32) -> Self {
+        match option {
+            1 => MenuAction::Random,
+            2 => MenuAction::Add,
+            3 => MenuAction::Remove,
+            4 => MenuAction::Display,
+            5 => MenuAction::Reset,
+            _ => MenuAction::Invalid,
+        }
+    }
+
+    fn requires_non_empty(&self) -> bool {
+        match self {
+            MenuAction::Random | MenuAction::Remove | MenuAction::Display | MenuAction::Reset => {
+                true
+            }
+            MenuAction::Add | MenuAction::Invalid => false,
+        }
+    }
+
+    fn execute(self, personalities: &mut Vec<(String, f32)>) {
+        if self.requires_non_empty() && personalities.is_empty() {
+            println!("No personalities found.");
+            return;
+        }
+
+        match self {
+            MenuAction::Random => personality::get_random_personality(personalities),
+            MenuAction::Add => personality::add_personality(personalities),
+            MenuAction::Remove => personality::remove_personality(personalities),
+            MenuAction::Display => display::display_personalities(personalities),
+            MenuAction::Reset => personality::reset_percentages(personalities),
+            MenuAction::Invalid => println!("Invalid option."),
+        }
+    }
+}
+
 fn main() {
     let mut personalities: Vec<(String, f32)> = Vec::new();
     file_io::read_file(&mut personalities);
@@ -33,13 +80,6 @@ fn main() {
             }
         };
 
-        match num_option {
-            1 => personality::get_random_personality(&mut personalities),
-            2 => personality::add_personality(&mut personalities),
-            3 => personality::remove_personality(&mut personalities),
-            4 => display::display_personalities(&personalities),
-            5 => personality::reset_percentages(&mut personalities),
-            _ => println!("Invalid option."),
-        }
+        MenuAction::from_number(num_option).execute(&mut personalities);
     }
 }

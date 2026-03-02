@@ -1,9 +1,4 @@
 pub fn display_personalities(personalities: &Vec<(String, f32)>) {
-    if personalities.is_empty() {
-        println!("No personalities found.");
-        return;
-    }
-
     const TITLE_HEADER: &str = "Title";
     const PERCENTAGE_HEADER: &str = "Percentage";
 

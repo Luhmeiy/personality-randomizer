@@ -14,11 +14,6 @@ fn recalculate_percentages(personalities: &mut Vec<(String, f32)>) {
 }
 
 pub fn get_random_personality(personalities: &mut Vec<(String, f32)>) {
-    if personalities.is_empty() {
-        println!("No personalities found.");
-        return;
-    }
-
     let mut random_personality_index = 0;
 
     let total_percentage = personalities.iter().map(|(_, value)| value).sum();
@@ -73,11 +68,6 @@ pub fn add_personality(personalities: &mut Vec<(String, f32)>) {
 }
 
 pub fn remove_personality(personalities: &mut Vec<(String, f32)>) {
-    if personalities.is_empty() {
-        println!("No personalities found.");
-        return;
-    }
-
     let display_items: Vec<&String> = personalities.iter().map(|(title, _)| title).collect();
 
     let selection = match Select::new()
@@ -104,11 +94,6 @@ pub fn remove_personality(personalities: &mut Vec<(String, f32)>) {
 }
 
 pub fn reset_percentages(personalities: &mut Vec<(String, f32)>) {
-    if personalities.is_empty() {
-        println!("No personalities found.");
-        return;
-    }
-
     let percentage = 100.0 / personalities.len() as f32;
 
     for (_, value) in personalities.iter_mut() {
